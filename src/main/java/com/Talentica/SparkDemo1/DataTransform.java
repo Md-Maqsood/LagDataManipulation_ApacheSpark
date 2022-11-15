@@ -43,9 +43,13 @@ public class DataTransform {
 				partitionNamesModified[i - 1] = m[5] + "_" + m[3];
 			}
 		} catch (FileNotFoundException e) {
-			e.getMessage();
+			System.out.println(e.getMessage());;
+			sc.close();
+			return;
 		} catch (IOException e) {
-			e.getMessage();
+			System.out.println(e.getMessage());;
+			sc.close();
+			return;
 		}
 		
 		sc.textFile(INPUT_PATH).filter(line -> !line.contains(":")).flatMapToPair((String x) -> {
