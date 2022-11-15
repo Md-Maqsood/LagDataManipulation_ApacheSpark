@@ -16,6 +16,7 @@ import scala.Tuple2;
 public class DataTransform {
 
 	public static final String INPUT_PATH = "oc-stats-analytics.csv";
+//	public static final String INPUT_PATH = "empty.csv";
 	public static final String OUTPUT_PATH = "output.csv";
 	public static final String DELIMITER = ",";
 	static String[] partitionNames = null;
@@ -25,19 +26,26 @@ public class DataTransform {
 		SparkConf conf = new SparkConf().setMaster("local").setAppName("CSVDataManipulation");
 		JavaSparkContext sc = new JavaSparkContext(conf);
 
-		try (BufferedReader reader = new BufferedReader(new FileReader(new File(INPUT_PATH)))) {
-			partitionNames = reader.readLine().split(DELIMITER);
+		File file = new File(INPUT_PATH);
+		
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String header = reader.readLine();
+			if(header.length()==0) {
+				sc.close();
+				System.out.println("Input_file is empty");
+				return;
+			}
+			partitionNames = header.split(DELIMITER);
 			partitionNamesModified = new String[partitionNames.length - 1];
 			for (int i = 1; i < partitionNames.length; i++) {
-				String name = partitionNames[i];
-				String[] l = name.split(":");
-				String[] m = l[1].split("\\.");
+				String[] m = partitionNames[i].split(":")[1].split("\\.");
 				partitionNamesModified[i - 1] = m[5] + "_" + m[3];
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			e.getMessage();
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.getMessage();
 		}
 		
 		sc.textFile(INPUT_PATH).filter(line -> !line.contains(":")).flatMapToPair((String x) -> {
