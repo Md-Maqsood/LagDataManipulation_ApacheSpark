@@ -62,8 +62,8 @@ public class DataTransform {
 				} catch (Exception e) {
 					return null;
 				}
-			}).filter(tuple -> tuple != null).collect(Collectors.toList()).iterator();
-		}).sortByKey().map((tuple) -> {
+			}).collect(Collectors.toList()).iterator();
+		}).filter(tuple -> tuple != null).sortByKey().map((tuple) -> {
 			return String.format("%s,%s,%s", tuple._2()._1(), tuple._1(), tuple._2()._2());
 		}).saveAsTextFile("output");
 		
